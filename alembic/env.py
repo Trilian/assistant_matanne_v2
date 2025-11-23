@@ -1,32 +1,64 @@
 import os
+import sys
 from logging.config import fileConfig
+from pathlib import Path
+
 from sqlalchemy import engine_from_config, pool
 from alembic import context
-from src.core.models import Base  # Base = declarative_base()
 
+# Ajouter le répertoire parent au path
+sys.path.insert(0, str(Path(__file__).parent.parent))
+
+from src.core.models import Base
+
+# Configuration Alembic
 config = context.config
 
-# logging
+# Logging
 if config.config_file_name is not None:
     fileConfig(config.config_file_name)
 
+# Métadonnées des modèles
 target_metadata = Base.metadata
 
-def run_migrations_offline():
-    url = os.environ.get("DATABASE_URL")
-    context.configure(url=url, target_metadata=target_metadata, literal_binds=True)
+def get_url():
+    """Récupère l'URL de la base depuis les variables d'environnement"""
+    return os.environ.get("DATABASE_URL", "postgresql://matanne:matanne_secret_2024@localhost:5432/matanne")
+
+def run_migrations_offline() -> None:
+    """Run migrations in 'offline' mode."""
+    url = get_url()
+    context.configure(
+        url=url,
+        target_metadata=target_metadata,
+        literal_binds=True,
+        dialect_opts={"paramstyle": "named"},
+    )
+
     with context.begin_transaction():
         context.run_migrations()
 
-def run_migrations_online():
+
+def run_migrations_online() -> None:
+    """Run migrations in 'online' mode."""
+    configuration = config.get_section(config.config_ini_section)
+    configuration["sqlalchemy.url"] = get_url()
+
     connectable = engine_from_config(
-        {"sqlalchemy.url": os.environ.get("DATABASE_URL")},
+        configuration,
+        prefix="sqlalchemy.",
         poolclass=pool.NullPool,
     )
+
     with connectable.connect() as connection:
-        context.configure(connection=connection, target_metadata=target_metadata)
+        context.configure(
+            connection=connection,
+            target_metadata=target_metadata
+        )
+
         with context.begin_transaction():
             context.run_migrations()
+
 
 if context.is_offline_mode():
     run_migrations_offline()

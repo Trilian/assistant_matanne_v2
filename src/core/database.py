@@ -4,7 +4,8 @@ Connexion PostgreSQL et gestion des sessions
 
 from contextlib import contextmanager
 from typing import Generator
-from sqlalchemy import create_engine, event
+from datetime import datetime
+from sqlalchemy import create_engine, event, text
 from sqlalchemy.orm import sessionmaker, Session
 from sqlalchemy.pool import NullPool, QueuePool
 import logging
@@ -147,7 +148,7 @@ def check_connection() -> bool:
     """Vérifie que la connexion fonctionne"""
     try:
         with get_db_context() as db:
-            db.execute("SELECT 1")
+            db.execute(text("SELECT 1"))
         return True
     except Exception as e:
         logger.error(f"❌ Connexion DB échouée: {e}")
@@ -158,12 +159,12 @@ def get_db_info() -> dict:
     """Informations sur la base de données"""
     try:
         with get_db_context() as db:
-            result = db.execute("""
+            result = db.execute(text("""
                 SELECT 
                     version() as version,
                     current_database() as database,
                     current_user as user
-            """).fetchone()
+            """)).fetchone()
 
             return {
                 "status": "connected",
@@ -264,7 +265,7 @@ def execute_raw_sql(sql: str, params: dict = None) -> list:
         Liste de résultats
     """
     with get_db_context() as db:
-        result = db.execute(sql, params or {})
+        result = db.execute(text(sql), params or {})
         return result.fetchall()
 
 
@@ -300,5 +301,5 @@ def vacuum_database():
     if settings.ENV == "production":
         logger.info("🧹 VACUUM de la base de données...")
         with engine.connect().execution_options(isolation_level="AUTOCOMMIT") as conn:
-            conn.execute("VACUUM ANALYZE")
+            conn.execute(text("VACUUM ANALYZE"))
         logger.info("✅ VACUUM terminé")

@@ -50,8 +50,8 @@ dev: ## Lance en mode développement (avec reload)
 docker-db: ## Démarre PostgreSQL avec Docker
 	@echo "$(GREEN)🐘 Démarrage PostgreSQL...$(NC)"
 	docker compose up -d postgres
-	@echo "$(YELLOW)⏳ Attente de 5 secondes...$(NC)"
-	sleep 5
+	@echo "$(YELLOW)⏳ Attente de 10 secondes...$(NC)"
+	@sleep 10 || timeout /t 10
 	@echo "$(GREEN)✅ PostgreSQL prêt$(NC)"
 
 docker-db-stop: ## Arrête PostgreSQL
