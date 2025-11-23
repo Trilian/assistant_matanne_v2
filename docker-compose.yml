@@ -1,0 +1,116 @@
+version: '3.8'
+
+services:
+  # PostgreSQL Database
+  postgres:
+    image: postgres:16-alpine
+    container_name: matanne-postgres
+    restart: unless-stopped
+    environment:
+      POSTGRES_USER: ${POSTGRES_USER:-matanne}
+      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD:-matanne_secret}
+      POSTGRES_DB: ${POSTGRES_DB:-matanne}
+      PGDATA: /var/lib/postgresql/data/pgdata
+    ports:
+      - "${POSTGRES_PORT:-5432}:5432"
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
+      - ./scripts/init_db.sql:/docker-entrypoint-initdb.d/init.sql
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U matanne"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+
+  # Redis (pour cache et tâches asynchrones)
+  redis:
+    image: redis:7-alpine
+    container_name: matanne-redis
+    restart: unless-stopped
+    ports:
+      - "${REDIS_PORT:-6379}:6379"
+    volumes:
+      - redis_data:/data
+    healthcheck:
+      test: ["CMD", "redis-cli", "ping"]
+      interval: 10s
+      timeout: 3s
+      retries: 3
+
+  # Application Streamlit
+  app:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    container_name: matanne-app
+    restart: unless-stopped
+    ports:
+      - "${APP_PORT:-8501}:8501"
+    environment:
+      - DATABASE_URL=postgresql://${POSTGRES_USER:-matanne}:${POSTGRES_PASSWORD:-matanne_secret}@postgres:5432/${POSTGRES_DB:-matanne}
+      - REDIS_URL=redis://redis:6379/0
+      - OLLAMA_URL=${OLLAMA_URL:-http://host.docker.internal:11434}
+      - OLLAMA_MODEL=${OLLAMA_MODEL:-llama2}
+      - WEATHER_API_KEY=${WEATHER_API_KEY}
+      - SECRET_KEY=${SECRET_KEY:-dev_secret_key_change_in_production}
+      - DEBUG=${DEBUG:-False}
+    volumes:
+      - ./src:/app/src
+      - ./data/backups:/app/data/backups
+    depends_on:
+      postgres:
+        condition: service_healthy
+      redis:
+        condition: service_healthy
+    command: streamlit run src/app.py --server.port=8501 --server.address=0.0.0.0
+
+  # Celery Worker (tâches asynchrones)
+  celery:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    container_name: matanne-celery
+    restart: unless-stopped
+    environment:
+      - DATABASE_URL=postgresql://${POSTGRES_USER:-matanne}:${POSTGRES_PASSWORD:-matanne_secret}@postgres:5432/${POSTGRES_DB:-matanne}
+      - REDIS_URL=redis://redis:6379/0
+      - OLLAMA_URL=${OLLAMA_URL:-http://host.docker.internal:11434}
+      - WEATHER_API_KEY=${WEATHER_API_KEY}
+    volumes:
+      - ./src:/app/src
+    depends_on:
+      postgres:
+        condition: service_healthy
+      redis:
+        condition: service_healthy
+    command: celery -A src.core.tasks worker --loglevel=info
+
+  # Celery Beat (tâches planifiées)
+  celery-beat:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    container_name: matanne-celery-beat
+    restart: unless-stopped
+    environment:
+      - DATABASE_URL=postgresql://${POSTGRES_USER:-matanne}:${POSTGRES_PASSWORD:-matanne_secret}@postgres:5432/${POSTGRES_DB:-matanne}
+      - REDIS_URL=redis://redis:6379/0
+      - OLLAMA_URL=${OLLAMA_URL:-http://host.docker.internal:11434}
+    volumes:
+      - ./src:/app/src
+    depends_on:
+      postgres:
+        condition: service_healthy
+      redis:
+        condition: service_healthy
+    command: celery -A src.core.tasks beat --loglevel=info
+
+volumes:
+  postgres_data:
+    driver: local
+  redis_data:
+    driver: local
+
+networks:
+  default:
+    name: matanne-network

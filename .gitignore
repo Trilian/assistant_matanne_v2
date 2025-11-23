@@ -1,0 +1,133 @@
+# Python
+__pycache__/
+*.py[cod]
+*$py.class
+*.so
+.Python
+build/
+develop-eggs/
+dist/
+downloads/
+eggs/
+.eggs/
+lib/
+lib64/
+parts/
+sdist/
+var/
+wheels/
+pip-wheel-metadata/
+share/python-wheels/
+*.egg-info/
+.installed.cfg
+*.egg
+MANIFEST
+
+# Virtual Environment
+.venv/
+venv/
+ENV/
+env/
+.virtualenvs/
+
+# PyCharm
+.idea/
+*.iml
+*.iws
+.idea_modules/
+
+# VS Code
+.vscode/
+*.code-workspace
+
+# Jupyter Notebook
+.ipynb_checkpoints
+
+# pytest
+.pytest_cache/
+.coverage
+htmlcov/
+*.cover
+.hypothesis/
+
+# mypy
+.mypy_cache/
+.dmypy.json
+dmypy.json
+
+# Environnement
+.env
+.env.local
+.env.*.local
+
+# Base de données
+*.db
+*.sqlite
+*.sqlite3
+data/*.db
+data/backups/*.sql
+data/backups/*.dump
+
+# Logs
+logs/
+*.log
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+
+# OS
+.DS_Store
+Thumbs.db
+*.swp
+*.swo
+*~
+
+# Streamlit
+.streamlit/secrets.toml
+
+# Docker
+docker-compose.override.yml
+
+# Fichiers temporaires
+tmp/
+temp/
+*.tmp
+*.bak
+*.backup
+
+# Uploads / Media
+uploads/
+media/
+
+# Documentation générée
+site/
+docs/_build/
+
+# Cache Redis
+dump.rdb
+
+# Celery
+celerybeat-schedule
+celerybeat.pid
+
+# Distribution / packaging
+.Python
+*.egg-info/
+dist/
+build/
+
+# Poetry
+poetry.lock  # Optionnel, à garder pour CI/CD
+
+# Alembic
+alembic/versions/*.pyc
+
+# Notebooks
+*.ipynb_checkpoints
+
+# Secrets et clés
+*.pem
+*.key
+secrets.yaml
+credentials.json
+token.json
