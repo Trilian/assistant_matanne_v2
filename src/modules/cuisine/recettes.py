@@ -222,7 +222,7 @@ def app():
             )
 
             if recette_selectionnee:
-                recette_id = df[df["nom"] == recette_selectionnee].iloc[0]["id"]
+                recette_id = int(df[df["nom"] == recette_selectionnee].iloc[0]["id"])
 
                 with get_db_context() as db:
                     recette = db.query(Recipe).filter(Recipe.id == recette_id).first()

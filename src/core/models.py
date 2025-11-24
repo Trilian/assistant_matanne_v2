@@ -82,7 +82,7 @@ class Notification(Base):
     user_id: Mapped[int] = mapped_column(ForeignKey("users.id", ondelete="CASCADE"))
     module: Mapped[str] = mapped_column(String(50), nullable=False)
     message: Mapped[str] = mapped_column(Text, nullable=False)
-    priority: Mapped[str] = mapped_column(SQLEnum(PrioriteEnum), default=PrioriteEnum.MOYENNE)
+    priority: Mapped[str] = mapped_column(SQLEnum(PrioriteEnum, native_enum=False), default=PrioriteEnum.MOYENNE)
     read: Mapped[bool] = mapped_column(Boolean, default=False)
     created_at: Mapped[datetime] = mapped_column(DateTime, default=datetime.utcnow)
 
@@ -171,7 +171,7 @@ class ShoppingList(Base):
     id: Mapped[int] = mapped_column(primary_key=True)
     ingredient_id: Mapped[int] = mapped_column(ForeignKey("ingredients.id", ondelete="CASCADE"))
     needed_quantity: Mapped[float] = mapped_column(Float, nullable=False)
-    priority: Mapped[str] = mapped_column(SQLEnum(PrioriteEnum), default=PrioriteEnum.MOYENNE)
+    priority: Mapped[str] = mapped_column(SQLEnum(PrioriteEnum, native_enum=False), default=PrioriteEnum.MOYENNE)
     purchased: Mapped[bool] = mapped_column(Boolean, default=False)
     ai_suggested: Mapped[bool] = mapped_column(Boolean, default=False)
     store_section: Mapped[Optional[str]] = mapped_column(String(100))  # Rayon
@@ -189,7 +189,7 @@ class BatchMeal(Base):
     recipe_id: Mapped[int] = mapped_column(ForeignKey("recipes.id", ondelete="CASCADE"))
     scheduled_date: Mapped[date] = mapped_column(Date, nullable=False)
     portions: Mapped[int] = mapped_column(Integer, default=4)
-    status: Mapped[str] = mapped_column(SQLEnum(StatutEnum), default=StatutEnum.A_FAIRE)
+    status: Mapped[str] = mapped_column(SQLEnum(StatutEnum, native_enum=False), default=StatutEnum.A_FAIRE)
     ai_planned: Mapped[bool] = mapped_column(Boolean, default=False)
     notes: Mapped[Optional[str]] = mapped_column(Text)
     created_at: Mapped[datetime] = mapped_column(DateTime, default=datetime.utcnow)
@@ -227,7 +227,7 @@ class WellbeingEntry(Base):
         ForeignKey("child_profiles.id", ondelete="CASCADE")
     )
     date: Mapped[date] = mapped_column(Date, nullable=False, default=date.today)
-    mood: Mapped[str] = mapped_column(SQLEnum(HumeurEnum), nullable=False)
+    mood: Mapped[str] = mapped_column(SQLEnum(HumeurEnum, native_enum=False), nullable=False)
     sleep_hours: Mapped[Optional[float]] = mapped_column(Float)
     activity: Mapped[Optional[str]] = mapped_column(String(200))
     notes: Mapped[Optional[str]] = mapped_column(Text)
@@ -267,7 +267,7 @@ class RoutineTask(Base):
     routine_id: Mapped[int] = mapped_column(ForeignKey("routines.id", ondelete="CASCADE"))
     task_name: Mapped[str] = mapped_column(String(200), nullable=False)
     scheduled_time: Mapped[Optional[str]] = mapped_column(String(10))  # HH:MM
-    status: Mapped[str] = mapped_column(SQLEnum(StatutEnum), default=StatutEnum.A_FAIRE)
+    status: Mapped[str] = mapped_column(SQLEnum(StatutEnum, native_enum=False), default=StatutEnum.A_FAIRE)
     completed_at: Mapped[Optional[datetime]] = mapped_column(DateTime)
     ai_reminder_sent: Mapped[bool] = mapped_column(Boolean, default=False)
 
@@ -288,8 +288,8 @@ class Project(Base):
     category: Mapped[Optional[str]] = mapped_column(String(100))
     start_date: Mapped[Optional[date]] = mapped_column(Date)
     end_date: Mapped[Optional[date]] = mapped_column(Date)
-    priority: Mapped[str] = mapped_column(SQLEnum(PrioriteEnum), default=PrioriteEnum.MOYENNE)
-    status: Mapped[str] = mapped_column(SQLEnum(StatutEnum), default=StatutEnum.A_FAIRE)
+    priority: Mapped[str] = mapped_column(SQLEnum(PrioriteEnum, native_enum=False), default=PrioriteEnum.MOYENNE)
+    status: Mapped[str] = mapped_column(SQLEnum(StatutEnum, native_enum=False), default=StatutEnum.A_FAIRE)
     progress: Mapped[int] = mapped_column(Integer, default=0)  # 0-100%
     ai_priority_score: Mapped[Optional[float]] = mapped_column(Float)
     created_at: Mapped[datetime] = mapped_column(DateTime, default=datetime.utcnow)
@@ -310,7 +310,7 @@ class ProjectTask(Base):
     project_id: Mapped[int] = mapped_column(ForeignKey("projects.id", ondelete="CASCADE"))
     task_name: Mapped[str] = mapped_column(String(200), nullable=False)
     description: Mapped[Optional[str]] = mapped_column(Text)
-    status: Mapped[str] = mapped_column(SQLEnum(StatutEnum), default=StatutEnum.A_FAIRE)
+    status: Mapped[str] = mapped_column(SQLEnum(StatutEnum, native_enum=False), default=StatutEnum.A_FAIRE)
     due_date: Mapped[Optional[date]] = mapped_column(Date)
     completed_at: Mapped[Optional[datetime]] = mapped_column(DateTime)
     estimated_duration: Mapped[Optional[int]] = mapped_column(Integer)  # minutes

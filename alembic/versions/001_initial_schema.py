@@ -56,7 +56,7 @@ def upgrade() -> None:
         sa.Column('user_id', sa.Integer(), nullable=False),
         sa.Column('module', sa.String(length=50), nullable=False),
         sa.Column('message', sa.Text(), nullable=False),
-        sa.Column('priority', sa.Enum('basse', 'moyenne', 'haute', name='prioriteenum'), nullable=True),
+        sa.Column('priority', sa.String(length=50), nullable=True),
         sa.Column('read', sa.Boolean(), nullable=True),
         sa.Column('created_at', sa.DateTime(), nullable=True),
         sa.ForeignKeyConstraint(['user_id'], ['users.id'], ondelete='CASCADE'),
@@ -126,7 +126,7 @@ def upgrade() -> None:
         sa.Column('id', sa.Integer(), nullable=False),
         sa.Column('ingredient_id', sa.Integer(), nullable=False),
         sa.Column('needed_quantity', sa.Float(), nullable=False),
-        sa.Column('priority', sa.Enum('basse', 'moyenne', 'haute', name='prioriteenum'), nullable=True),
+        sa.Column('priority', sa.String(length=50), nullable=True),
         sa.Column('purchased', sa.Boolean(), nullable=True),
         sa.Column('ai_suggested', sa.Boolean(), nullable=True),
         sa.Column('store_section', sa.String(length=100), nullable=True),
@@ -142,7 +142,7 @@ def upgrade() -> None:
         sa.Column('recipe_id', sa.Integer(), nullable=False),
         sa.Column('scheduled_date', sa.Date(), nullable=False),
         sa.Column('portions', sa.Integer(), nullable=True),
-        sa.Column('status', sa.Enum('à faire', 'en cours', 'terminé', 'annulé', name='statutenum'), nullable=True),
+        sa.Column('status', sa.String(length=50), nullable=True),
         sa.Column('ai_planned', sa.Boolean(), nullable=True),
         sa.Column('notes', sa.Text(), nullable=True),
         sa.Column('created_at', sa.DateTime(), nullable=True),
@@ -170,7 +170,7 @@ def upgrade() -> None:
         sa.Column('id', sa.Integer(), nullable=False),
         sa.Column('child_id', sa.Integer(), nullable=True),
         sa.Column('date', sa.Date(), nullable=False),
-        sa.Column('mood', sa.Enum('😊 Bien', '😐 Moyen', '😞 Mal', name='humeurenum'), nullable=False),
+        sa.Column('mood', sa.String(length=50), nullable=False),
         sa.Column('sleep_hours', sa.Float(), nullable=True),
         sa.Column('activity', sa.String(length=200), nullable=True),
         sa.Column('notes', sa.Text(), nullable=True),
@@ -201,7 +201,7 @@ def upgrade() -> None:
         sa.Column('routine_id', sa.Integer(), nullable=False),
         sa.Column('task_name', sa.String(length=200), nullable=False),
         sa.Column('scheduled_time', sa.String(length=10), nullable=True),
-        sa.Column('status', sa.Enum('à faire', 'en cours', 'terminé', 'annulé', name='statutenum'), nullable=True),
+        sa.Column('status', sa.String(length=50), nullable=True),
         sa.Column('completed_at', sa.DateTime(), nullable=True),
         sa.Column('ai_reminder_sent', sa.Boolean(), nullable=True),
         sa.ForeignKeyConstraint(['routine_id'], ['routines.id'], ondelete='CASCADE'),
@@ -220,8 +220,8 @@ def upgrade() -> None:
         sa.Column('category', sa.String(length=100), nullable=True),
         sa.Column('start_date', sa.Date(), nullable=True),
         sa.Column('end_date', sa.Date(), nullable=True),
-        sa.Column('priority', sa.Enum('basse', 'moyenne', 'haute', name='prioriteenum'), nullable=True),
-        sa.Column('status', sa.Enum('à faire', 'en cours', 'terminé', 'annulé', name='statutenum'), nullable=True),
+        sa.Column('priority', sa.String(length=50), nullable=True),
+        sa.Column('status', sa.String(length=50), nullable=True),
         sa.Column('progress', sa.Integer(), nullable=True),
         sa.Column('ai_priority_score', sa.Float(), nullable=True),
         sa.Column('created_at', sa.DateTime(), nullable=True),
@@ -235,7 +235,7 @@ def upgrade() -> None:
         sa.Column('project_id', sa.Integer(), nullable=False),
         sa.Column('task_name', sa.String(length=200), nullable=False),
         sa.Column('description', sa.Text(), nullable=True),
-        sa.Column('status', sa.Enum('à faire', 'en cours', 'terminé', 'annulé', name='statutenum'), nullable=True),
+        sa.Column('status', sa.String(length=50), nullable=True),
         sa.Column('due_date', sa.Date(), nullable=True),
         sa.Column('completed_at', sa.DateTime(), nullable=True),
         sa.Column('estimated_duration', sa.Integer(), nullable=True),
@@ -371,8 +371,3 @@ def downgrade() -> None:
     op.drop_table('notifications')
     op.drop_table('user_profiles')
     op.drop_table('users')
-
-    # Drop enums
-    sa.Enum(name='prioriteenum').drop(op.get_bind())
-    sa.Enum(name='statutenum').drop(op.get_bind())
-    sa.Enum(name='humeurenum').drop(op.get_bind())

@@ -224,7 +224,7 @@ def app():
             )
 
             if article_select:
-                item_id = df[df["nom"] == article_select].iloc[0]["id"]
+                item_id = int(df[df["nom"] == article_select].iloc[0]["id"])
 
                 col_a1, col_a2, col_a3, col_a4 = st.columns(4)
 
